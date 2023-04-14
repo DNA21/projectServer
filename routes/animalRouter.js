@@ -1,5 +1,6 @@
 const express= require('express');
 const Animal = require('../models/animal');
+const authenticate = require('../authenticate');
 
 const animalRouter = express.Router();
 
@@ -13,7 +14,7 @@ animalRouter.route('/')
     })
     .catch(err => next(err));
 })
-.post((req, res, next) => {
+.post(authenticate.verifyUser, (req, res, next) => {
     Animal.create(req.body)
     .then(animal => {
         console.log('Animal Created ', animal);
@@ -23,11 +24,11 @@ animalRouter.route('/')
     })
     .catch(err => next(err))
 })
-.put((req, res) => {
+.put(authenticate.verifyUser, (req, res) => {
     res.statusCode = 403;
     res.end('PUT operation not suppored on /animals');
 })
-.delete((req, res, next) => {
+.delete(authenticate.verifyUser, (req, res, next) => {
     Animal.deleteMany()
     .then(response => {
         res.statusCode = 200;
@@ -47,11 +48,11 @@ animalRouter.route('/:animalId')
     })
     .catch(err => next(err));
 })
-.post((req, res, next) => {
+.post(authenticate.verifyUser, (req, res, next) => {
     res.statusCode = 403
     res.end(`POST operation not suppored on /animals/${req.params.animalId}`);
 })
-.put((req, res, next) => {
+.put(authenticate.verifyUser, (req, res, next) => {
     Animal.findByIdAndUpdate(req.params.animalId, {
         $set: req.body
     }, { new: true })
@@ -62,7 +63,7 @@ animalRouter.route('/:animalId')
     })
     .catch(err => next(err))
 })
-.delete((req, res, next) => {
+.delete(authenticate.verifyUser, (req, res, next) => {
     Animal.findByIdAndDelete(req.params.animalId)
     .then(response => {
         res.statusCode = 200;
